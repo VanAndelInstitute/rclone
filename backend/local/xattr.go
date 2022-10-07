@@ -14,13 +14,20 @@ import (
 )
 
 const (
-	xattrPrefix    = "user." // FIXME is this correct for all unixes?
-	xattrSupported = xattr.XATTR_SUPPORTED
+	xattrPrefix = "user." // FIXME is this correct for all unixes?
+	//ZR disable XATTR until we fix issue https://forum.rclone.org/t/invalid-metadata-key-names-result-in-a-failure-to-transfer-xattr-results-in-failure-to-upload-net-http-invalid-header-field-value-for-x-amz-meta-samba-pai/33406
+	//xattrSupported = xattr.XATTR_SUPPORTED
+	xattrSupported = false
 )
 
 // Check to see if the error supplied is a not supported error, and if
 // so, disable xattrs
 func (f *Fs) xattrIsNotSupported(err error) bool {
+
+	//ZR disable XATTR until we fix issue https://forum.rclone.org/t/invalid-metadata-key-names-result-in-a-failure-to-transfer-xattr-results-in-failure-to-upload-net-http-invalid-header-field-value-for-x-amz-meta-samba-pai/33406
+	atomic.CompareAndSwapInt32(&f.xattrSupported, 1, 0)
+	return true
+
 	xattrErr, ok := err.(*xattr.Error)
 	if !ok {
 		return false
